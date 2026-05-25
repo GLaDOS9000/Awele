@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from interfaces import IBoard
+from core.interfaces import IBoard
 
 
 class Board(IBoard):
@@ -58,8 +58,8 @@ class Board(IBoard):
 
         self._holes[pit] = 0
 
-        # When seeds > TOTAL_PITS we loop: origin pit is always skipped.
-        skip = pit if seeds > self.TOTAL_PITS else None
+        # When seeds >= TOTAL_PITS we loop: origin pit is always skipped.
+        skip = pit if seeds >= self.TOTAL_PITS else None
 
         drop_sequence: list[int] = []
         current = pit
