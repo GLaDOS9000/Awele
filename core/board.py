@@ -151,21 +151,3 @@ class Board(IBoard):
         if not isinstance(other, Board):
             return NotImplemented
         return self._holes == other._holes and self._stores == other._stores
-
-
-if __name__ == "__main__":
-    b = Board()
-    print("=== initial board ===")
-    print(b)
-
-    print("\n=== after sowing pit 0 ===")
-    b.sow(0)
-    print(b)
-
-    print("\n=== after sowing pit 11 (wraps) ===")
-    b.sow(11)
-    print(b)
-
-    print("\n=== after adding 6 seeds to P0 store ===")
-    b.add_to_store(0, 6)
-    print(b)
