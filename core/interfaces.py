@@ -112,6 +112,22 @@ class IBoard(ABC):
         """
         ...
 
+    @abstractmethod
+    def zero_pit(self, pit: int) -> int:
+        """
+        Empty pit and return the seeds that were there.
+        Called by IRules.apply_captures — board primitive, not a rule.
+        """
+        ...
+
+    @abstractmethod
+    def add_to_store(self, player_id: int, seeds: int) -> None:
+        """
+        Move seeds into a player's store.
+        Called by IRules.apply_captures and final_scores.
+        """
+        ...
+
 
 # ---------------------------------------------------------------------------
 # IRules — stateless validator and capture engine
@@ -145,7 +161,7 @@ class IRules(ABC):
         ...
 
     @abstractmethod
-    def apply_captures(self, board: IBoard, last_pit: int) -> int:
+    def apply_captures(self, board: IBoard, last_pit: int, player_id: int) -> int:
         """
         Execute chain capture (rafle) starting from last_pit backwards.
         Captures if last_pit is on opponent's side and contains 2 or 3 seeds.

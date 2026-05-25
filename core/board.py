@@ -7,7 +7,7 @@ from core.interfaces import IBoard
 
 class Board(IBoard):
     """
-    Concrete Awale board.
+    Concrete Awele board.
 
     Pit layout (absolute indices):
         Player 0 side  →  0  1  2  3  4  5   (left to right from P0's view)
@@ -89,7 +89,7 @@ class Board(IBoard):
         return np.array(self._holes + self._stores, dtype=np.int16)
 
     # ------------------------------------------------------------------
-    # Convenience — used by Rules and Game, not part of IBoard contract
+    # IBoard abstract methods — state mutations
     # ------------------------------------------------------------------
 
     def add_to_store(self, player_id: int, seeds: int) -> None:
