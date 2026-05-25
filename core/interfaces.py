@@ -13,18 +13,19 @@ import numpy as np
 
 @dataclass
 class GameState:
-    board: "IBoard"
+    board_array: np.ndarray
     current_player: int  # 0 or 1
     done: bool
     winner: int | None
     scores: tuple[int, int]  # (P0_seeds, P1_seeds)
     last_action: int | None  # pit index played, None on reset
+    no_capture_count: int = 0  # counts consecutive non-capture moves for draw condition
 
 
 @dataclass
 class StepResult:
     state: GameState
-    reward: float
+    reward: float = 0.0  # reward from the perspective of the player action
     info: dict[str, Any] = field(default_factory=dict)
 
 
@@ -246,6 +247,8 @@ class IGame(ABC):
     Single source of truth for turn order, action translation,
     reward calculation, and observation construction.
     """
+
+    NO_CAPTURE_LIMIT: int = 50
 
     @abstractmethod
     def reset(self) -> GameState:
