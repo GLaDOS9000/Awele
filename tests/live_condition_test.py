@@ -50,6 +50,9 @@ class MinimalBoard(IBoard):
     def add_to_store(self, player_id: int, seeds: int) -> None:
         self._stores[player_id] += seeds
 
+    def render_from(self, player_id: int) -> str:
+        return f"MinimalBoard(holes={self._holes}, stores={self._stores}, pov={player_id})"
+
 
 class TestRulesOnIBoard:
     def test_would_starve_works_on_non_board_iboard(self, rules: Rules) -> None:

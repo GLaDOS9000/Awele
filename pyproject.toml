@@ -3,7 +3,7 @@ name = "awele"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.13,<3.14"
 dependencies = ["numpy>=2.4.6", "pygame>=2.6.0"]
 
 [project.optional-dependencies]
@@ -21,6 +21,8 @@ dev = ["pytest>=7.4.0", "ty>=0.0.39", "pre-commit>=4.0.0"]
 
 [project.scripts]
 awele = "main:main"
+awele-cli = "interfaces.cli.cli_main:cli_main"
+awele-gui = "interfaces.gui.controller:gui_main"
 
 [tool.uv]
 package = true

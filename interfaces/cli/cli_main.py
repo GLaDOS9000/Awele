@@ -66,7 +66,7 @@ def run(
 
 
 def cli_main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Awale CLI")
+    parser = argparse.ArgumentParser(description="Awele CLI")
     parser.add_argument("--p0", choices=["human", "random"], default="human")
     parser.add_argument("--p1", choices=["human", "random"], default="random")
     parser.add_argument("--seed", type=int, default=None)

@@ -178,7 +178,7 @@ class IRules(ABC):
         ...
 
     @abstractmethod
-    def is_terminal(self, board: IBoard) -> bool:
+    def is_terminal(self, board: IBoard, current_player: int) -> bool:
         """
         True when one side has no seeds (current player cannot move).
         Does NOT sweep remaining seeds — call final_scores() for that.
@@ -286,6 +286,17 @@ class IGame(ABC):
     @abstractmethod
     def get_valid_actions(self) -> list[int]:
         """Local pit indices (0-5) legal for the current player."""
+        ...
+
+    @abstractmethod
+    def preview_action(self, local_action: int) -> np.ndarray | None:
+        """
+        Simulate local_action without mutating game state.
+        Returns a player-relative board array of shape (TOTAL_PITS + 2,):
+            [my_pits(6), opp_pits(6), my_store(1), opp_store(1)]
+        Same coordinate frame as get_observation()["board"] + ["stores"].
+        Returns None if local_action is illegal for the current player.
+        """
         ...
 
     @abstractmethod
