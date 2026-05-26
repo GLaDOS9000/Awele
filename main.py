@@ -1,4 +1,3 @@
-from tkinter import N
 from core.board import Board
 from core.game import Awele
 from core.player import RandomPlayer
@@ -15,33 +14,39 @@ def main() -> None:
         players=[RandomPlayer(0, seed=42), RandomPlayer(1, seed=SEED)],
     )
 
-    state = game.reset()
+    game.reset()
     game.render()
     move = 0
+    result = None
 
-    while not state.done:
-        current = state.current_player
+    while not game.done:
+        # game workflow
         obs = game.get_observation()
+        current = obs["current_player"]
         action = game._players[current].choose_action(obs, obs["action_mask"])
-        absolute = current * IBoard.PITS_PER_SIDE + action
         result = game.step(action)
-        state = result.state
+
+        # rendering and logging
         move += 1
+        absolute = current * IBoard.PITS_PER_SIDE + action
         print(
             f"\n--- move {move}: P{current} plays pit {absolute} (local {action}) ---\n\n"
         )
         game.render()
         print(
-            f"  stores: P0={state.scores[0]}  P1={state.scores[1]}  "
-            f"no-capture streak: {state.no_capture_count}"
+            f"  stores: P0={result.state.scores[0]}  P1={result.state.scores[1]}  "
+            f"no-capture streak: {result.state.no_capture_count}"
         )
 
+    assert (
+        result is not None
+    )  # type checker doesn't know game.done implies result is set
     print("\n=== game over ===")
-    if state.winner is not None:
-        print(f"winner: P{state.winner}")
+    if result.state.winner is not None:
+        print(f"winner: P{result.state.winner}")
     else:
         print("draw")
-    print(f"final scores — P0: {state.scores[0]}  P1: {state.scores[1]}")
+    print(f"final scores — P0: {result.state.scores[0]}  P1: {result.state.scores[1]}")
     print(f"total moves: {move}")
 
 

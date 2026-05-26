@@ -273,6 +273,7 @@ class IGame(ABC):
           board[6:12] = opponent's pits
           stores      = [my_store, opponent_store]
           action_mask = bool array of length PITS_PER_SIDE
+          done        = whether the game is over (for terminal state rendering)
         This symmetry means an RL agent never needs to know its player_id.
         """
         ...
@@ -289,6 +290,12 @@ class IGame(ABC):
         mode='rgb_array' → np.ndarray (H, W, 3) for video recording
         mode='silent'    → None (used during RL training)
         """
+        ...
+
+    @property
+    @abstractmethod
+    def done(self) -> bool:
+        """True if the game has reached a terminal state."""
         ...
 
     # ------------------------------------------------------------------

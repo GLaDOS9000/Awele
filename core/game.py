@@ -131,6 +131,7 @@ class Awele(IGame):
             "current_player": player_id,
             "board_repr": repr(self._board),
             "no_capture_count": self._no_capture_count,
+            "done": self._done,
         }
 
     def get_valid_actions(self) -> list[int]:
@@ -147,6 +148,10 @@ class Awele(IGame):
         if mode == "rgb_array":
             raise NotImplementedError("rgb_array rendering not yet implemented.")
         return board_str
+
+    @property
+    def done(self) -> bool:
+        return self._done
 
     # ------------------------------------------------------------------
     # Private helpers
