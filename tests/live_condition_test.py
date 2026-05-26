@@ -50,8 +50,8 @@ class MinimalBoard(IBoard):
     def add_to_store(self, player_id: int, seeds: int) -> None:
         self._stores[player_id] += seeds
 
-    def render_from(self, pov: int) -> str:
-        return f"MinimalBoard(holes={self._holes}, stores={self._stores}, pov={pov})"
+    def render_from(self, player_id: int) -> str:
+        return f"MinimalBoard(holes={self._holes}, stores={self._stores}, pov={player_id})"
 
 
 class TestRulesOnIBoard:
