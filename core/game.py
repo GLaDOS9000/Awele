@@ -79,9 +79,10 @@ class Awele(IGame):
         else:
             self._no_capture_count += 1
 
-        # Terminal check
+        # Terminal check — evaluated from next player's perspective
+        next_player = 1 - player_id
         done = (
-            self._rules.is_terminal(self._board)
+            self._rules.is_terminal(self._board, next_player)
             or self._no_capture_count >= self.NO_CAPTURE_LIMIT
         )
         winner = None
@@ -103,7 +104,14 @@ class Awele(IGame):
             for player in self._players:
                 player.on_game_end(terminal_state)
         else:
-            self._current_player = 1 - player_id
+            # Advance turn — but if next player has no seeds and CAN be fed,
+            # keep current player to feed them next move
+            next_valid = self._rules.valid_actions(self._board, next_player)
+            if next_valid:
+                self._current_player = next_player
+            else:
+                # next player has no seeds but can be fed — current player plays again
+                self._current_player = player_id
 
         self._last_action = action
         return StepResult(state=self._make_state(winner=winner, done=done))
@@ -137,6 +145,26 @@ class Awele(IGame):
     def get_valid_actions(self) -> list[int]:
         abs_actions = self._rules.valid_actions(self._board, self._current_player)
         return [self._absolute_to_local(p) for p in abs_actions]
+
+    def preview_action(self, local_action: int) -> np.ndarray | None:
+        """
+        Clone the board, apply local_action (sow + capture), and return
+        the resulting state as a player-relative array — same layout as
+        get_observation(): [my_pits(6), opp_pits(6), my_store, opp_store].
+        Returns None if local_action is illegal.
+        """
+        player_id = self._current_player
+        absolute = self._local_to_absolute(local_action, player_id)
+        if absolute not in self._rules.valid_actions(self._board, player_id):
+            return None
+        clone = self._board.clone()
+        seq = clone.sow(absolute)
+        self._rules.apply_captures(clone, seq[-1], player_id)
+        opponent = 1 - player_id
+        my_pits = [clone.holes[p] for p in IBoard.side_pits(player_id)]
+        opp_pits = [clone.holes[p] for p in IBoard.side_pits(opponent)]
+        stores = [clone.stores[player_id], clone.stores[opponent]]
+        return np.array(my_pits + opp_pits + stores, dtype=np.int16)
 
     def render(self, pov: int | None = None, mode: str = "human") -> str | None:
         player_view = pov if pov is not None else self._current_player

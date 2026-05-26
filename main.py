@@ -57,7 +57,7 @@ import argparse
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Awale")
+    parser = argparse.ArgumentParser(description="Awele")
     parser.add_argument("--mode", choices=["cli", "gui", "web"], default="cli")
     args, remaining = parser.parse_known_args()
 
@@ -67,10 +67,9 @@ def main() -> None:
         cli_main(remaining)
 
     elif args.mode == "gui":
-        raise NotImplementedError("GUI mode is not implemented yet.")
-        from interfaces.gui.pygame.controller import main as gui_main
+        from interfaces.gui.controller import gui_main
 
-        gui_main()
+        gui_main(remaining)
 
     elif args.mode == "web":
         raise NotImplementedError("Web mode is not implemented yet.")

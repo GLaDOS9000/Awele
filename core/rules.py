@@ -32,13 +32,10 @@ class Rules(IRules):
         """
         candidate = [pit for pit in IBoard.side_pits(player_id) if board.holes[pit] > 0]
         if not candidate:
-            return []
-
+            return []  # no seeds — cannot move, opponent should feed
         non_starving = [
             pit for pit in candidate if not self.would_starve(board, pit, player_id)
         ]
-
-        # Affamer exception: if every move starves, all candidates are legal
         return non_starving if non_starving else candidate
 
     # ------------------------------------------------------------------
@@ -93,13 +90,33 @@ class Rules(IRules):
     # IRules — terminal state
     # ------------------------------------------------------------------
 
-    def is_terminal(self, board: IBoard) -> bool:
+    def is_terminal(self, board: IBoard, current_player: int) -> bool:
         """
-        The game ends when either side has no seeds left.
+        Game ends when the current player has no seeds AND the opponent
+        cannot feed them (i.e. no move by the opponent would place seeds
+        on the current player's side).
+        Also ends when no legal actions exist for the current player and
+        feeding is impossible.
         """
-        return all(board.holes[p] == 0 for p in IBoard.side_pits(0)) or all(
-            board.holes[p] == 0 for p in IBoard.side_pits(1)
-        )
+        # If current player has seeds, game continues
+        if any(board.holes[p] > 0 for p in IBoard.side_pits(current_player)):
+            return False
+        # Current player has no seeds — check if opponent can feed them
+        return not self._can_feed(board, 1 - current_player, current_player)
+
+    def _can_feed(self, board: IBoard, feeder: int, starved: int) -> bool:
+        """
+        True if any move by feeder would place at least one seed
+        on starved player's side.
+        """
+        for pit in IBoard.side_pits(feeder):
+            if board.holes[pit] == 0:
+                continue
+            clone = board.clone()
+            seq = clone.sow(pit)
+            if any(p in IBoard.side_pits(starved) for p in seq):
+                return True
+        return False
 
     def final_scores(self, board: IBoard) -> tuple[int, int]:
         """

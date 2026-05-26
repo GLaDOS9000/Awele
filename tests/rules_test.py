@@ -230,19 +230,34 @@ class TestCaptures:
 
 class TestIsTerminal:
     def test_not_terminal_at_start(self, rules: Rules, board: Board) -> None:
-        assert rules.is_terminal(board) is False
+        assert rules.is_terminal(board, current_player=0) is False
 
-    def test_terminal_p0_empty(self, rules: Rules) -> None:
-        b = make_board([0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4])
-        assert rules.is_terminal(b) is True
+    def test_terminal_p0_empty_and_cannot_be_fed(self, rules: Rules) -> None:
+        b = make_board(
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0,
+                0,
+            ]
+        )
+        assert rules.is_terminal(b, current_player=0) is True
 
-    def test_terminal_p1_empty(self, rules: Rules) -> None:
-        b = make_board([4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0])
-        assert rules.is_terminal(b) is True
+    def test_terminal_p1_empty_and_cannot_be_fed(self, rules: Rules) -> None:
+        b = make_board([4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        assert rules.is_terminal(b, current_player=1) is True
 
     def test_not_terminal_one_seed_each(self, rules: Rules) -> None:
         b = make_board([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
-        assert rules.is_terminal(b) is False
+        assert rules.is_terminal(b, current_player=0) is False
 
 
 # ---------------------------------------------------------------------------
