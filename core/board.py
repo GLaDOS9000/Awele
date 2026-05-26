@@ -102,6 +102,65 @@ class Board(IBoard):
         self._holes[pit] = 0
         return seeds
 
+    def render_from(self, player_id: int) -> str:
+        if player_id == 0:
+            top = self._holes[6:12][::-1]
+            bottom = self._holes[0:6]
+            top_store = self._stores[1]
+            bot_store = self._stores[0]
+            top_idx = [11, 10, 9, 8, 7, 6]
+            bot_idx = [0, 1, 2, 3, 4, 5]
+            top_label = "P1 (opponent)"
+            bot_label = "P0 (you)"
+        else:
+            top = self._holes[0:6][::-1]
+            bottom = self._holes[6:12]
+            top_store = self._stores[0]
+            bot_store = self._stores[1]
+            top_idx = [5, 4, 3, 2, 1, 0]
+            bot_idx = [6, 7, 8, 9, 10, 11]
+            top_label = "P0 (opponent)"
+            bot_label = "P1 (you)"
+
+        store_w = max(2, len(str(max(self._stores))))
+        pit_w = max(2, len(str(max(self._holes))))
+
+        def fmt_store(v: int | None) -> str:
+            return " " * store_w if v is None else str(v).rjust(store_w)
+
+        def fmt_pit(v: int) -> str:
+            return str(v).rjust(pit_w)
+
+        def pit_row(pits: list) -> str:
+            return "  ".join(fmt_pit(v) for v in pits)
+
+        pad = 4
+        inner_w = len(pit_row(bottom))
+        W = store_w + pad + inner_w + pad + store_w
+
+        # bar = "+" + "-" * W + "+"
+        top_bar = "<" + "-" * W + "+"
+        bottom_bar = "+" + "-" * W + ">"
+        offset = " " * (store_w + pad)
+        idx_t = "  ".join(str(i).rjust(pit_w) for i in top_idx)
+        idx_b = "  ".join(str(i).rjust(pit_w) for i in bot_idx)
+
+        def board_row(store_l: int | None, pits: list, store_r: int | None) -> str:
+            return f"|{fmt_store(store_l)}{' ' * pad}{pit_row(pits)}{' ' * pad}{fmt_store(store_r)}|"
+
+        lines = [
+            f"  {top_label}",
+            f" {offset}{idx_t}",
+            top_bar,
+            board_row(top_store, top, None),
+            "|" + "·" * W + "|",
+            board_row(None, bottom, bot_store),
+            bottom_bar,
+            f" {offset}{idx_b}",
+            f"  {bot_label}",
+        ]
+        return "\n".join(lines)
+
     # ------------------------------------------------------------------
     # Dunder
     # ------------------------------------------------------------------
@@ -142,7 +201,7 @@ class Board(IBoard):
             "|" + "·" * W + "|",
             board_row(None, p0, self._stores[0]),
             bar,
-            f"  {offset}{idx0}",
+            f" {offset}{idx0}",
             "  P0 (pits 0-5)",
         ]
         return "\n".join(lines)

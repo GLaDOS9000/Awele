@@ -138,8 +138,9 @@ class Awele(IGame):
         abs_actions = self._rules.valid_actions(self._board, self._current_player)
         return [self._absolute_to_local(p) for p in abs_actions]
 
-    def render(self, mode: str = "human") -> str | None:
-        board_str = repr(self._board)
+    def render(self, pov: int | None = None, mode: str = "human") -> str | None:
+        player_view = pov if pov is not None else self._current_player
+        board_str = self._board.render_from(player_view)
         if mode == "human":
             print(board_str)
             return None

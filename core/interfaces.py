@@ -129,6 +129,11 @@ class IBoard(ABC):
         """
         ...
 
+    @abstractmethod
+    def render_from(self, player_id: int) -> str:
+        """Render board from player_id's perspective — their pits always at the bottom."""
+        ...
+
 
 # ---------------------------------------------------------------------------
 # IRules — stateless validator and capture engine
@@ -284,8 +289,9 @@ class IGame(ABC):
         ...
 
     @abstractmethod
-    def render(self, mode: str = "human") -> str | None:
+    def render(self, pov: int | None = None, mode: str = "human") -> str | None:
         """
+        pov: if specified, rotates the board to this player's perspective for rendering.
         mode='human'     → ASCII board string for CLI
         mode='rgb_array' → np.ndarray (H, W, 3) for video recording
         mode='silent'    → None (used during RL training)

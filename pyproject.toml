@@ -4,7 +4,33 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = ["numpy>=2.4.6", "ty>=0.0.39", "pytest>=7.4.0"]
+dependencies = ["numpy>=2.4.6", "pygame>=2.6.0"]
+
+[project.optional-dependencies]
+rl = [
+    "torch>=2.12.0",
+    "gymnasium>=1.2.3",
+    "stable-baselines3>=2.3.0",
+    "sb3-contrib>=2.3.0",
+    "tensorboard>=2.18.0",
+]
+
+web = ["fastapi>=0.115.0", "uvicorn>=0.32.0", "websockets>=13.0"]
+
+dev = ["pytest>=7.4.0", "ty>=0.0.39"]
+
+[project.scripts]
+awele = "main:main"
+
+[tool.uv]
+package = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["core", "rl", "interfaces"]
