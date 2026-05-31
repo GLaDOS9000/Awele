@@ -130,9 +130,6 @@ def run_game(
             menu_hovered=view.menu_button_rect.collidepoint(mx, my),
         )
 
-        if done:
-            return _handle_events_done(view)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
@@ -154,17 +151,18 @@ def run_game(
                     continue
                 if view.menu_button_rect.collidepoint(ex, ey):
                     return "menu"
-                pit = view.pit_at(ex, ey)
-                if pit is not None and current in human_ids:
-                    if IBoard.pit_owner(pit) == current:
-                        local = pit % IBoard.PITS_PER_SIDE
-                        if action_mask[local]:
-                            for p in players:
-                                if (
-                                    isinstance(p, PygameHumanPlayer)
-                                    and p.player_id == current
-                                ):
-                                    p.receive_action(local)
+                if not done:
+                    pit = view.pit_at(ex, ey)
+                    if pit is not None and current in human_ids:
+                        if IBoard.pit_owner(pit) == current:
+                            local = pit % IBoard.PITS_PER_SIDE
+                            if action_mask[local]:
+                                for p in players:
+                                    if (
+                                        isinstance(p, PygameHumanPlayer)
+                                        and p.player_id == current
+                                    ):
+                                        p.receive_action(local)
             if event.type == pygame.MOUSEMOTION:
                 ex, ey = event.pos
                 pit = view.pit_at(ex, ey)
@@ -174,13 +172,18 @@ def run_game(
                 else:
                     hovered_pit = None
 
-        if current not in human_ids and not done:
+        if done:
+            view.tick()
+            continue
+
+        if current not in human_ids:
             if pygame.time.get_ticks() >= delay_until:
                 action = players[current].choose_action(obs, action_mask)
                 result = game.step(action)
                 winner = result.state.winner
                 hovered_pit = None
-        elif current in human_ids:
+                delay_until = pygame.time.get_ticks() + delay_ms
+        else:
             for p in players:
                 if isinstance(p, PygameHumanPlayer) and p.player_id == current:
                     action = p.pop_action()
@@ -191,24 +194,6 @@ def run_game(
                         if human_ids != {0, 1}:
                             delay_until = pygame.time.get_ticks() + delay_ms
 
-        view.tick()
-
-
-def _handle_events_done(view: PygameView) -> str:
-    """Wait after game ends. Returns 'menu' or 'quit'."""
-    while True:
-        mx, my = pygame.mouse.get_pos()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return "quit"
-            if event.type == pygame.KEYDOWN:
-                if event.key in (pygame.K_q, pygame.K_ESCAPE):
-                    return "quit"
-                if event.key == pygame.K_m:
-                    return "menu"
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if view.menu_button_rect.collidepoint(event.pos):
-                    return "menu"
         view.tick()
 
 
